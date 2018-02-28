@@ -1,0 +1,25 @@
+{
+  "name": "overflow_background_job",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dominicusrobert/overflow_background_job.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dominicusrobert/overflow_background_job/issues"
+  },
+  "homepage": "https://github.com/dominicusrobert/overflow_background_job#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.2",
+    "nodemailer": "^4.6.0"
+  }
+}
