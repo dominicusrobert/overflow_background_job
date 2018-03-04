@@ -1,42 +1,40 @@
 'use strict';
-const nodemailer = require('nodemailer');
-const transportData = {
-    service: 'gmail',
-    secure: false,
-    port: 5432,
-    secure: false,
-    auth: {
-        user: process.env.NODE_MAILER_EMAIL,
-        pass: process.env.NODE_MAILER_PASSWORD
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-}
-
+const kue = require('kue')
+const queue = kue.createQueue()
 
 class EmailController {
 
     static sendEmail(req, res) {
-        nodemailer.createTestAccount((err, account) => {
-            const transporter = nodemailer.createTransport(transportData);
-            const mailOptions = {
-                from: '"Overflow" <no-reply@overflow.com>', 
-                to: req.body.email, 
-                subject: 'Registration Success', 
-                text: 'Congratulation, You have registered in overflow.dominicusrobert.com'
-            };
+        let emailAddressTarget = req.body.email
 
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    return console.log(error);
+        var job = queue.create('email-service', {
+            title: 'Send email',
+            from: '"Overflow" <no-reply@overflow.com>',
+            to: emailAddressTarget,
+            subject: 'Registration Success',
+            text: 'Congratulation, You have registered in overflow.dominicusrobert.com'
+        })
+
+        job.on('complete', function (result) {
+            console.log('Job completed with data ', result)
+        }).on('failed attempt', function (errorMessage, doneAttempts) {
+            console.error('Job failed')
+        }).on('failed', function (errorMessage) {
+            console.error('Job failed')
+        }).on('progress', function (progress, data) {
+            console.error('\r  job #' + job.id + ' ' + progress + '% complete with data ', data);
+        })
+        
+        job.save(
+            (err) => {
+                if (!err) {
+                    console.log(job.id);
+                    res.status(200).end();
+                    return;
                 }
-
-                res.send('Success')
-                // console.log('Message sent: %s', JSON.stringify(info));
-                // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                console.log(err);
+                res.status(500).end();
             });
-        });
     }
 
 }
